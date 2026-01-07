@@ -153,9 +153,16 @@
 <div class="card">
   <h1>Calculadora de Prepagos</h1>
 
-  <label>📅 Fecha de verificación</label>
-  <input type="date" id="fecha">
-  <div class="helper-text">Corresponde a la confirmación del mail por parte del afiliado.</div>
+<label>
+  📅 Fecha de verificación
+  <span class="tooltip">
+    <span class="tooltip-icon">ℹ️</span>
+    <span class="tooltip-text">
+      Corresponde a la confirmación del correo electrónico.
+    </span>
+  </span>
+</label>
+<input type="date" id="fecha">
 
   <label>💳 Medio de pago</label>
   <select id="medio">
