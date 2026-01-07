@@ -5,7 +5,6 @@
   <title>Calculadora de Prepagos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Tipografía Sora -->
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -35,7 +34,6 @@
 
     label {
       font-size: 14px;
-      font-weight: 400;
       margin-top: 14px;
       display: block;
     }
@@ -48,6 +46,13 @@
       border-radius: 10px;
       border: 1px solid #d1d5db;
       font-family: 'Sora', sans-serif;
+    }
+
+    .error {
+      font-size: 13px;
+      color: #c0392b;
+      margin-top: 6px;
+      display: none;
     }
 
     button {
@@ -81,11 +86,6 @@
       display: none;
     }
 
-    .item {
-      margin: 8px 0;
-      font-size: 14px;
-    }
-
     .highlight {
       font-size: 22px;
       font-weight: 700;
@@ -105,7 +105,6 @@
 
     .copied {
       font-size: 13px;
-      color: #005E5C;
       margin-top: 8px;
       display: none;
       font-weight: 700;
@@ -117,7 +116,7 @@
 <div class="card">
   <h1>Calculadora de Prepagos</h1>
 
-  <label>📅 Fecha de activación</label>
+  <label>📅 Fecha de alta</label>
   <input type="date" id="fecha">
 
   <label>💳 Medio de pago</label>
@@ -129,18 +128,14 @@
 
   <label>💰 Cuota mensual del plan</label>
   <input type="number" id="cuota" placeholder="Ej: 45000">
+  <div class="error" id="errorCuota">Por favor, ingresá el monto de la cuota mensual.</div>
 
   <button class="btn-primary" onclick="calcular()">Calcular</button>
 
   <div class="result" id="resultado">
-    <div class="item">✔ Cobertura desde: <strong id="inicio"></strong></div>
-    <div class="item">📆 Días de cobertura: <strong id="dias"></strong></div>
-
-    <div class="item">💵 Monto a pagar ahora</div>
+    <div>📅 Fecha de activación: <strong id="inicio"></strong></div>
+    <div>💵 Monto a pagar ahora</div>
     <div class="highlight">$<span id="proporcional"></span></div>
-
-    <div class="item">🧾 Forma de cobro: <strong id="cobro"></strong></div>
-
     <div class="message" id="mensaje"></div>
 
     <button class="btn-secondary" onclick="copiarMensaje()">📋 Copiar mensaje</button>
@@ -152,43 +147,50 @@
 function calcular() {
   const fechaInput = document.getElementById("fecha").value;
   const medio = document.getElementById("medio").value;
-  const cuota = parseFloat(document.getElementById("cuota").value);
+  const cuotaInput = document.getElementById("cuota");
+  const cuota = parseFloat(cuotaInput.value);
 
+  document.getElementById("errorCuota").style.display = cuota ? "none" : "block";
   if (!fechaInput || !medio || !cuota) return;
 
-  const fecha = new Date(fechaInput + "T00:00:00");
-  const dia = fecha.getDate();
-  const diasMes = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 0).getDate();
-  const diasActivos = diasMes - dia + 1;
-  const escenario = dia <= 15 ? "A" : "B";
+  const fechaAlta = new Date(fechaInput + "T00:00:00");
+  const dia = fechaAlta.getDate();
+  const mes = fechaAlta.getMonth();
+  const anio = fechaAlta.getFullYear();
 
+  let fechaActivacion = new Date(fechaAlta);
   let proporcional = 0;
-  let cobro = "";
   let mensaje = "";
 
-  if (escenario === "A") {
+  if (dia >= 16 && dia <= 19) {
+    fechaActivacion = new Date(anio, mes, 20);
+    mensaje =
+      `La afiliación se dará de alta con activación el ${fechaActivacion.toLocaleDateString()}. ` +
+      `No se factura monto proporcional. La primera cuota completa se cobrará el mes siguiente.`;
+  } 
+  else if (dia >= 20) {
+    mensaje =
+      `La afiliación se activa el ${fechaAlta.toLocaleDateString()}. ` +
+      `No se factura monto proporcional. La primera cuota completa se cobrará el mes siguiente.`;
+  } 
+  else {
+    const diasMes = new Date(anio, mes + 1, 0).getDate();
+    const diasActivos = diasMes - dia + 1;
     proporcional = (cuota * (diasActivos / diasMes)).toFixed(2);
 
     if (medio === "tarjeta") {
-      cobro = "Antes del 20 se enviará el débito a la tarjeta. El afiliado lo pagará el mes que viene, al vencimiento de su resumen.";
+      mensaje =
+        `La afiliación se encuentra activa desde el ${fechaAlta.toLocaleDateString()}. ` +
+        `El monto proporcional es de $${proporcional} . Abonará el mes que viene, al vencimiento del resumen de este mes.`;
     } else {
-      cobro = "El monto proporcional se cobrará junto con la cuota del mes siguiente.";
+      mensaje =
+        `La afiliación se encuentra activa desde el ${fechaAlta.toLocaleDateString()}. ` +
+        `El monto proporcional es de $${proporcional} y se cobrará junto con la cuota del mes siguiente. Se enviarán los dos montos por débito.`;
     }
-
-    mensaje =
-      `Tu cobertura se encuentra activa desde el ${fecha.toLocaleDateString()}. ` +
-      `El monto a abonar ahora es $${proporcional}. ${cobro}`;
-  } else {
-    cobro = "La primera cuota completa se cobrará el mes siguiente.";
-    mensaje =
-      `Tu cobertura se activa desde el ${fecha.toLocaleDateString()}. ` +
-      `No se factura monto proporcional. ${cobro}`;
   }
 
-  document.getElementById("inicio").innerText = fecha.toLocaleDateString();
-  document.getElementById("dias").innerText = diasActivos;
-  document.getElementById("proporcional").innerText = escenario === "A" ? proporcional : "0";
-  document.getElementById("cobro").innerText = cobro;
+  document.getElementById("inicio").innerText = fechaActivacion.toLocaleDateString();
+  document.getElementById("proporcional").innerText = proporcional ? proporcional : "0";
   document.getElementById("mensaje").innerText = mensaje;
 
   document.getElementById("resultado").style.display = "block";
