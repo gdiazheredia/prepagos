@@ -176,12 +176,12 @@ function calcular() {
     }
 
     mensaje =
-      `La cobertura se encuentra activa desde el ${fecha.toLocaleDateString()}. ` +
+      `Tu cobertura se encuentra activa desde el ${fecha.toLocaleDateString()}. ` +
       `El monto a abonar ahora es $${proporcional}. ${cobro}`;
   } else {
     cobro = "La primera cuota completa se cobrará el mes siguiente.";
     mensaje =
-      `La cobertura se activa desde el ${fecha.toLocaleDateString()}. ` +
+      `Tu cobertura se activa desde el ${fecha.toLocaleDateString()}. ` +
       `No se factura monto proporcional. ${cobro}`;
   }
 
