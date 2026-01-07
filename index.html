@@ -175,8 +175,8 @@ function calcular() {
   } 
   else {
     const diasMes = new Date(anio, mes + 1, 0).getDate();
-    const diasActivos = diasMes - dia + 1;
-    proporcional = (cuota * (diasActivos / diasMes)).toFixed(2);
+    const diasActivos = diasMes - dia;
+    proporcional = Math.round(cuota * (diasActivos / diasMes)).toFixed(2);
 
     if (medio === "tarjeta") {
     mensaje =
