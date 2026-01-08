@@ -230,14 +230,10 @@ function calcular() {
     const diasActivos = diasMes - dia;
     proporcional = Math.round(cuota * (diasActivos / diasMes)).toFixed(2);
 
-  const mesPago = obtenerMesSiguiente(fechaAlta);
-
+    if (medio === "tarjeta") {
     mensaje =
-      `La afiliación se encuentra activa desde el ${fechaAlta.toLocaleDateString()}. ` +
-      `El monto proporcional es de $${proporcional}. ` +
-      `El débito se enviará antes del 20 del mes en curso y se abonará en ${mesPago}, ` +
-      `al vencimiento del resumen de la tarjeta.`;
-    
+      `La cobertura se activa el ${fechaAlta.toLocaleDateString()}. ` +
+      `El monto proporcional es de $${proporcional}. El débito se enviará antes del 20 del mes en curso y se abonará al vencimiento del resumen de la tarjeta.`;
     } else {
       mensaje =
         `La cobertura se activa el ${fechaAlta.toLocaleDateString()}. ` +
@@ -256,18 +252,6 @@ function calcular() {
 function copiarMensaje() {
   navigator.clipboard.writeText(document.getElementById("mensaje").innerText);
   document.getElementById("copiado").style.display = "block";
-}
-  <script>
-function obtenerMesSiguiente(fecha) {
-  const meses = [
-    "enero", "febrero", "marzo", "abril", "mayo", "junio",
-    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"
-  ];
-
-  const mesActual = fecha.getMonth();
-  const mesSiguiente = (mesActual + 1) % 12;
-
-  return meses[mesSiguiente];
 }
 </script>
 
